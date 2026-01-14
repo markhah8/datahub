@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "datahub-eks"
+  },
+  {
+    "ParameterKey": "KubernetesVersion",
+    "ParameterValue": "1.28"
+  },
+  {
+    "ParameterKey": "VpcCIDR",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "NodeInstanceType",
+    "ParameterValue": "m5.large"
+  },
+  {
+    "ParameterKey": "NodeGroupDesiredCapacity",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "NodeGroupMinSize",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "NodeGroupMaxSize",
+    "ParameterValue": "5"
+  }
+]

@@ -8,6 +8,16 @@ The following is a set of instructions to quickstart DataHub on AWS Elastic Kube
 assumes that you do not have a kubernetes cluster set up. If you are deploying DataHub to an existing cluster, please
 skip the corresponding sections.
 
+## Quick Start with Infrastructure as Code
+
+For automated deployments, we provide infrastructure-as-code templates in the [contrib/deployment/aws](../../contrib/deployment/aws/) directory:
+
+- **[Terraform](../../contrib/deployment/aws/terraform/)** - Complete EKS cluster with VPC, networking, and IAM roles
+- **[CloudFormation](../../contrib/deployment/aws/cloudformation/)** - AWS native templates for EKS deployment
+- **[Deployment Scripts](../../contrib/deployment/aws/scripts/)** - Automation scripts for end-to-end deployment
+
+These examples provide a faster, more repeatable way to deploy DataHub on AWS compared to manual setup. See the respective READMEs for detailed instructions.
+
 ## Prerequisites
 
 This guide requires the following tools:
