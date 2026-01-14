@@ -1,0 +1,136 @@
+# Sample DataHub Helm values for AWS EKS deployment
+# This file configures DataHub to run on EKS with in-cluster storage
+# For production, consider using AWS managed services (see datahub-values-managed.yaml)
+
+global:
+  # DataHub version
+  datahub_version: head
+
+  # Elasticsearch settings (in-cluster)
+  elasticsearch:
+    host: "prerequisites-elasticsearch-master"
+    port: "9200"
+    useSSL: "false"
+
+  # Kafka settings (in-cluster)  
+  kafka:
+    bootstrap:
+      server: "prerequisites-kafka-broker:9092"
+    zookeeper:
+      server: "prerequisites-zookeeper:2181"
+    schemaregistry:
+      url: "http://prerequisites-cp-schema-registry:8081"
+
+  # MySQL settings (in-cluster)
+  sql:
+    datasource:
+      host: "prerequisites-mysql:3306"
+      hostForMysqlClient: "prerequisites-mysql"
+      port: "3306"
+      url: "jdbc:mysql://prerequisites-mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8"
+      driver: "com.mysql.jdbc.Driver"
+      username: "root"
+      password:
+        secretRef: mysql-secrets
+        secretKey: mysql-root-password
+
+  # Neo4j (optional - can be disabled)
+  neo4j:
+    host: "prerequisites-neo4j:7474"
+    uri: "bolt://prerequisites-neo4j:7687"
+    username: "neo4j"
+    password:
+      secretRef: neo4j-secrets
+      secretKey: neo4j-password
+
+  # Enable metadata service authentication
+  metadata_service_authentication:
+    enabled: true
+
+# DataHub Frontend
+datahub-frontend:
+  enabled: true
+  image:
+    repository: acryldata/datahub-frontend-react
+    tag: "head"
+  
+  # Ingress configuration for AWS ALB
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: instance
+      # Uncomment and set your certificate ARN for HTTPS
+      # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:REGION:ACCOUNT:certificate/CERTIFICATE_ID
+      alb.ingress.kubernetes.io/inbound-cidrs: 0.0.0.0/0
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+      # For HTTPS, use:
+      # alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      # alb.ingress.kubernetes.io/ssl-redirect: '443'
+    hosts:
+      - host: datahub.example.com  # Change to your domain
+        paths:
+          - /*
+
+# DataHub GMS (Generalized Metadata Service)
+datahub-gms:
+  enabled: true
+  image:
+    repository: acryldata/datahub-gms
+    tag: "head"
+
+# Prerequisites (in-cluster storage)
+prerequisites:
+  enabled: true
+  
+  elasticsearch:
+    enabled: true
+    replicas: 3
+    minimumMasterNodes: 2
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+      limits:
+        memory: "3Gi"
+        cpu: "2000m"
+    volumeClaimTemplate:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "gp3"
+      resources:
+        requests:
+          storage: 50Gi
+  
+  mysql:
+    enabled: true
+    primary:
+      persistence:
+        enabled: true
+        storageClass: "gp3"
+        size: 50Gi
+  
+  kafka:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClass: "gp3"
+      size: 50Gi
+    zookeeper:
+      persistence:
+        enabled: true
+        storageClass: "gp3"
+        size: 20Gi
+  
+  neo4j:
+    enabled: false  # Optional - can be enabled if needed
+    persistence:
+      storageClass: "gp3"
+      size: 20Gi
+
+# DataHub Actions (for UI-based ingestion)
+acryl-datahub-actions:
+  enabled: true
+  image:
+    repository: acryldata/datahub-actions
+    tag: "head"

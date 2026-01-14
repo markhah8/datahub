@@ -1,0 +1,36 @@
+# Copy this file to terraform.tfvars and customize the values
+# terraform.tfvars
+
+# Basic Configuration
+cluster_name = "datahub-eks"
+region       = "us-west-2"
+environment  = "dev"
+
+# EKS Configuration
+cluster_version = "1.28"
+
+# Node Configuration
+node_instance_type = "m5.large"
+node_count         = 3
+node_min_count     = 2
+node_max_count     = 5
+node_capacity_type = "ON_DEMAND"  # or "SPOT" for cost savings
+
+# Network Configuration
+vpc_cidr           = "10.0.0.0/16"
+single_nat_gateway = true  # Set to false for HA (higher cost)
+
+# Managed Services (optional)
+# Set to true to create RDS, OpenSearch, and MSK
+enable_managed_services = false
+
+# If enable_managed_services = true, customize these:
+# rds_instance_class      = "db.t3.medium"
+# opensearch_instance_type = "t3.medium.search"
+# msk_instance_type       = "kafka.m5.large"
+
+# Additional Tags
+tags = {
+  Owner = "DataHub Team"
+  CostCenter = "Engineering"
+}
